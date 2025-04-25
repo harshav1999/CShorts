@@ -23,64 +23,43 @@ st.caption("Stay updated with the latest summarized news, all in one place.")
 CATEGORIES = ["Trending", "Business", "Tech&AI", "Entertainment",
               "Sports", "USA", "India"]
 
-# horizontal=True gives us a very light "navbar" look & feel
-category = st.radio(
-    "Category Selection",
-    CATEGORIES,
-    index=0,
-    horizontal=True,
-    label_visibility="collapsed"  # hide the radio header text
-)
-
-# ——— (optional) tiny CSS tweak so it really looks like a nav bar —
-st.markdown(
-    """
-    <style>
-    div.stRadio > label { display: flex; justify-content: center; }
-    div.stRadio > label div { 
-        padding: 0.4rem 1rem; border-radius: 0.5rem;
-        font-weight: 600; cursor: pointer;
-    }
-    /* highlight the active tab */
-    div.stRadio > label div[data-selected="true"] {
-        background: rgba(0,0,0,0.1);
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# Create tabs for categories
+tabs = st.tabs(CATEGORIES)
 
 # ——— 4) QUERY ARTICLES ————————————————————————————————
-query = {"is_summarized": 1, "is_ranked": 1}     # always summarized and ranked
-if category != "Trending":                       # "Trending" = show all
-    query["custom_category"] = category
+for i, tab in enumerate(tabs):
+    with tab:
+        category = CATEGORIES[i]
+        query = {"is_summarized": 1, "is_ranked": 1}     # always summarized and ranked
+        if category != "Trending":                       # "Trending" = show all
+            query["custom_category"] = category
 
-articles = collection.find(query).sort("importance_score", -1).limit(10)
+        articles = collection.find(query).sort("ranking_score", -1).limit(10)
 
-# ——— 5) RENDER —————————————————————————————————————————————
-for article in articles:
-    with st.container():
-        col1, col2 = st.columns([1, 4], gap="large")
+        # ——— 5) RENDER —————————————————————————————————————————————
+        for article in articles:
+            with st.container():
+                col1, col2 = st.columns([1, 4], gap="large")
 
-        # — image —
-        with col1:
-            st.image(
-                article.get(
-                    "image",
-                    "https://via.placeholder.com/150?text=No+Image"),
-                use_container_width=True
-            )
+                # — image —
+                with col1:
+                    st.image(
+                        article.get(
+                            "image",
+                            "https://via.placeholder.com/150?text=No+Image"),
+                        use_container_width=True
+                    )
 
-        # — text —
-        with col2:
-            st.markdown(f"### {article.get('title', 'No Title')}")
-            st.markdown(
-                f"**Source:** {article['source'].get('name','Unknown')}"
-                f" &nbsp; | &nbsp; 📅 {article.get('publishedAt','')[:10]}"
-            )
-            st.markdown(article.get('summary', '*No summary available.*'))
+                # — text —
+                with col2:
+                    st.markdown(f"### {article.get('title', 'No Title')}")
+                    st.markdown(
+                        f"**Source:** {article['source'].get('name','Unknown')}"
+                        f" &nbsp; | &nbsp; 📅 {article.get('publishedAt','')[:10]}"
+                    )
+                    st.markdown(article.get('summary', '*No summary available.*'))
 
-        st.divider()  # prettier than '---'
+                st.divider()  # prettier than '---'
 
 # ——— 6) FOOTER ————————————————————————————————————————————
 st.markdown(
