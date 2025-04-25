@@ -6,8 +6,6 @@ import os
 load_dotenv()
 mongo_uri = os.getenv("MONGO_URI")
 
-# === Load API Key from .env file ===
-load_dotenv()
 
 # === Connect to MongoDB Atlas ===
 client = MongoClient(mongo_uri)
