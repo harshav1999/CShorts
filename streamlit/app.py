@@ -58,6 +58,7 @@ if category != "Trending":                       # “Trending” = show all
 articles = collection.find(query).sort("publishedAt", -1)
 
 # ——— 5) RENDER —————————————————————————————————————————————
+# ——— 5) RENDER —————————————————————————————————————————————
 for article in articles:
     with st.container():
         col1, col2 = st.columns([1, 4], gap="large")
@@ -65,9 +66,8 @@ for article in articles:
         # — image —
         with col1:
             st.image(
-                article.get(
-                    "image",
-                    "https://via.placeholder.com/150?text=No+Image"),
+                article.get("image",
+                            "https://via.placeholder.com/150?text=No+Image"),
                 use_container_width=True
             )
 
@@ -80,7 +80,18 @@ for article in articles:
             )
             st.markdown(article.get('summary', '*No summary available.*'))
 
+            # — THINK CHAIN —
+            think_raw = article.get("thinkchain", "").strip()
+            if think_raw:
+                with st.expander("🤔 Think Chain", expanded=False):
+                    # If you stored it as a single string with newline-separated
+                    # questions, just render as-is:
+                    st.markdown(think_raw)
+                    # If you stored it as a Python list instead, use:
+                    # for q in think_raw: st.markdown(f"- {q}")
+
         st.divider()  # prettier than '---'
+
 
 # ——— 6) FOOTER ————————————————————————————————————————————
 st.markdown(
