@@ -23,9 +23,9 @@ st.caption("Stay updated with the latest summarized news, all in one place.")
 CATEGORIES = ["Trending", "Business", "Tech&AI", "Entertainment",
               "Sports", "USA", "India"]
 
-# horizontal=True gives us a very light “navbar” look & feel
+# horizontal=True gives us a very light "navbar" look & feel
 category = st.radio(
-    "",
+    "Category Selection",
     CATEGORIES,
     index=0,
     horizontal=True,
@@ -51,11 +51,11 @@ st.markdown(
 )
 
 # ——— 4) QUERY ARTICLES ————————————————————————————————
-query = {"is_summarized": 1}                     # always summarized
-if category != "Trending":                       # “Trending” = show all
+query = {"is_summarized": 1, "is_ranked": 1}     # always summarized and ranked
+if category != "Trending":                       # "Trending" = show all
     query["custom_category"] = category
 
-articles = collection.find(query).sort("publishedAt", -1)
+articles = collection.find(query).sort("importance_score", -1).limit(10)
 
 # ——— 5) RENDER —————————————————————————————————————————————
 for article in articles:
