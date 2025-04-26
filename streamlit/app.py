@@ -30,11 +30,19 @@ tabs = st.tabs(CATEGORIES)
 for i, tab in enumerate(tabs):
     with tab:
         category = CATEGORIES[i]
-        query = {"is_summarized": 1, "is_ranked": 1}     # always summarized and ranked
+        query = {
+            "is_summarized": 1, 
+            "is_ranked": 1
+        }
         if category != "Trending":                       # "Trending" = show all
             query["custom_category"] = category
 
-        articles = collection.find(query).sort("ranking_score", -1).limit(10)
+        # Get articles from the last 24 hours
+        one_day_ago = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        query["publishedAt"] = {"$gte": one_day_ago.isoformat()}
+
+        # Sort by publishedAt in descending order and limit to 20 most recent articles
+        articles = collection.find(query).sort("publishedAt", -1).limit(20)
 
         # ——— 5) RENDER —————————————————————————————————————————————
         for article in articles:
