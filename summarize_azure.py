@@ -139,6 +139,6 @@ Here’s the article content:
 
 if __name__ == "__main__":
     obj = SummarizeAzure()
-    # obj.summarize()
+    obj.summarize()
     obj.thinkchain()
         
