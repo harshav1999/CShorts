@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from pprint import pprint
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -75,23 +75,30 @@ def rank_articles_by_category():
     # Get all categories
     categories = ["Trending", "Business", "Tech&AI", "Entertainment", "Sports", "USA", "India"]
     
+    # Calculate date 7 days ago
+    one_day_ago = datetime.utcnow() - timedelta(days=1)
+    
     for category in categories:
         print(f"\nProcessing category: {category}")
         print("=" * 50)
         
-        # Get articles for this category
+        # Get articles for this category from the last 7 days
         query = {
             "custom_category": category,
-            "is_summarized": 1
+            "is_summarized": 1,
+            "publishedAt": {"$gte": one_day_ago.isoformat()}
         }
-        articles = list(collection.find(query).sort("publishedAt", -1))
         
-        print(f"Found {len(articles)} articles to rank")
+        # Sort by publishedAt in descending order and limit to 20 most recent articles
+        articles = list(collection.find(query).sort("publishedAt", -1).limit(20))
+        
+        print(f"Found {len(articles)} recent articles to rank")
         
         # Rank each article
         for i, article in enumerate(articles):
             print(f"\nRanking article {i+1}/{len(articles)}")
             print(f"Title: {article.get('title', 'No Title')}")
+            print(f"Published: {article.get('publishedAt', 'No Date')}")
             
             # Get ranking
             ranking = get_article_rank(article, client)
