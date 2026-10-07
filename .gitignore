@@ -2,3 +2,4 @@
 __pycache__/
 *.pyc
 venv/
+news_articles_with_full_content.json
